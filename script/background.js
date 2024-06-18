@@ -22,8 +22,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 		fetch('http://127.0.0.1:8080/mock')
 			.then(response => response.json())
 			.then(data => sendResponse({ data: data }))
-			.catch(error => console.error(error));
-		return true;
+			.catch(error => sendResponse( { e: error }));
 	}
 	if (request.action === "addNewNotes") {
 		console.log("call addNewNotes ");
@@ -40,11 +39,11 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 		)
 			.then(response => response.json())
 			.then(data => sendResponse({ data: data }))
-			.catch(error => console.error(error));
-		return true;
+			.catch(error => sendResponse( { e: error }));
 	}
-});
 
+	return true;
+});
 
 
 chrome.contextMenus.onClicked.addListener((item, tab) => {
