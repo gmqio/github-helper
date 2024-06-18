@@ -3,6 +3,18 @@ import json
 from bottle import response
 from bottle import request
 
+@route('/debug', method=['OPTIONS', 'POST'])
+def debug(): 
+    print(json.loads(request.body.read().decode('utf-8')))
+    
+    response.content_type = 'application/json'
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, OPTIONS, FETCH'
+    response.headers['Access-Control-Allow-Headers'] = 'Origin, Accept, Content-Type, X-Requested-With, X-CSRF-Token'
+    return json.dumps({
+        "code" : "ok"
+    })
+    
 @route('/add', method=['OPTIONS', 'POST'])
 def add(): 
     print(json.loads(request.body.read().decode('utf-8')))

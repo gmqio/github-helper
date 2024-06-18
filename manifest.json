@@ -1,7 +1,7 @@
 ﻿{
   "manifest_version": 3,
   "name": "Github Helper",
-  "permissions": ["contextMenus","activeTab", "scripting"],
+  "permissions": ["contextMenus","activeTab", "scripting", "storage"],
   "version": "0.1",
   "description": "read github source helper",
 
