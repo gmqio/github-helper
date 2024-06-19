@@ -1,7 +1,7 @@
 ﻿{
   "manifest_version": 3,
   "name": "Github Helper",
-  "permissions": ["contextMenus","activeTab", "scripting", "storage"],
+  "permissions": ["contextMenus","activeTab", "scripting", "storage", "tabs"],
   "version": "0.1",
   "description": "read github source helper",
 
@@ -12,7 +12,7 @@
   "content_scripts": [ 
     {
       "all_frames": true,
-      "js": ["script/jquery-3.7.1.js", "script/content_script.js" ],
+      "js": ["script/jquery-3.7.1.min.js", "script/content_script.js" ],
       "css": ["css/index.css"],
       "matches": [ "https://github.com/*" ],
       "run_at": "document_end"

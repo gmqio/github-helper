@@ -17,21 +17,21 @@ chrome.runtime.onInstalled.addListener(() => {
 	});
 });
 
-function buildGetParams(data){
-	return  Object.keys(data)
-    .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(data[key])}`)
-    .join('&');
+function buildGetParams(data) {
+	return Object.keys(data)
+		.map(key => `${encodeURIComponent(key)}=${encodeURIComponent(data[key])}`)
+		.join('&');
 }
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {	  
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 	if (request.action === "getNotesByLine") {
-		fetch('http://127.0.0.1:6001/note/query?' + buildGetParams(request.data))
+		fetch('http://81.70.42.24:6001/note/query?' + buildGetParams(request.data))
 			.then(response => response.json())
 			.then(data => sendResponse({ data: data }))
-			.catch(error => sendResponse( { e: error }));
+			.catch(error => sendResponse({ e: error }));
 	}
 	if (request.action === "addNewNotes") {
 		fetch(
-			"http://127.0.0.1:6001/note/add",
+			"http://81.70.42.24:6001/note/add",
 			{
 				method: 'POST',
 				headers: {
@@ -41,16 +41,28 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 				mode: 'no-cors'
 			}
 		)
-			.then(response => response.json())
-			.then(data => sendResponse({ data: data }))
-			.catch(error => sendResponse( { e: error }));
+			.then(data => {
+				console.log("send result done", data);
+				chrome.runtime.sendMessage({ action: 'send_popup_add_result_success', data: request.data });
+				sendResponse({ data: data });
+			})
+			.catch(error => {
+				console.log("send result error", error);
+				if (error && Object.keys(error).length > 0) {
+					chrome.runtime.sendMessage({ action: 'send_popup_add_result_error', ex: error });
+				} else {
+					chrome.runtime.sendMessage({ action: 'send_popup_add_result_success', data: {} });
+				}
+
+				sendResponse({ e: error })
+			});
 	}
 
 	if (request.action === "passSelectedInfo") {
 		chrome.storage.local.set({
 			selectedInfo: request.data
 		});
-    }
+	}
 
 	return true;
 });
@@ -69,7 +81,7 @@ function debug(message, sendResponse) {
 	)
 		.then(response => response.json())
 		.then(data => sendResponse({ data: data }))
-		.catch(error => sendResponse( { e: error }));
+		.catch(error => sendResponse({ e: error }));
 }
 
 chrome.contextMenus.onClicked.addListener((item, tab) => {
