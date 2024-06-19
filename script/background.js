@@ -17,16 +17,21 @@ chrome.runtime.onInstalled.addListener(() => {
 	});
 });
 
+function buildGetParams(data){
+	return  Object.keys(data)
+    .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(data[key])}`)
+    .join('&');
+}
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {	  
 	if (request.action === "getNotesByLine") {
-		fetch('http://127.0.0.1:8080/mock')
+		fetch('http://127.0.0.1:6001/note/query?' + buildGetParams(request.data))
 			.then(response => response.json())
 			.then(data => sendResponse({ data: data }))
 			.catch(error => sendResponse( { e: error }));
 	}
 	if (request.action === "addNewNotes") {
 		fetch(
-			"http://127.0.0.1:8080/add",
+			"http://127.0.0.1:6001/note/add",
 			{
 				method: 'POST',
 				headers: {

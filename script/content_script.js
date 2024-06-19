@@ -14,6 +14,28 @@ function getUserName() {
         return "no";
     }
 }
+
+function getFileInfo() {
+    var filePath = location.href.split('/');
+    var repo = filePath[3];
+    var project = filePath[4];
+    var fileUrl = '';
+    
+    if (location.href.indexOf('#') > -1){
+        fileUrl = location.href.substring(0, location.href.indexOf('#'));
+    } else if (location.href.indexOf('?') > -1) {
+        fileUrl = location.href.substring(0, location.href.indexOf('?'));
+    }else{
+        fileUrl = location.href;
+    }
+
+    return {
+        GithubRepo: repo,
+        GithubProject: project,
+        GithubURL: fileUrl
+    }
+    
+}
 $(document).ready(function () {
     document.addEventListener('contextmenu', function (e) {
         var textarea = document.getElementById('read-only-cursor-text-area');
@@ -21,10 +43,10 @@ $(document).ready(function () {
             var selectedText = textarea.value.substring(textarea.selectionStart, textarea.selectionEnd);
             var selectedLine = getSelectedTextLine(textarea);
             var current = {
-                userName: getUserName(),
-                selectedText: selectedText,
-                selectedLine: selectedLine,
-                url: location.href
+                UserName: getUserName(),
+                SelectedText: selectedText,
+                SelectedLine: selectedLine,
+                ...getFileInfo()
             };
             chrome.runtime.sendMessage({
                 data: current,
@@ -35,28 +57,34 @@ $(document).ready(function () {
             console.log("passSelectedInfo done", current);
         }
     });
-
+    
     chrome.runtime.sendMessage(
         {
             action: "getNotesByLine",
-            url: location.href
+            data: {
+                UserName: getUserName(), 
+                ...getFileInfo()
+            }
         },
         function (response) {
-            var ann_arr = response.data;
+            var notes_arr = response.data.data;
             $('.react-blob-header-edit-and-raw-actions').eq(0).prepend('<div id="tiger_comment">已加载Tiger的评论</div>');
             $('.react-blob-header-edit-and-raw-actions').eq(0).prepend('<div class="tip" style="display:none">hello, I am some demo comments</div>');
 
             $('.react-line-number').each((index, lineDiv) => { // <div data-line-number="2" class="react-line-number react-code-text" style="padding-right: 16px;">2</div>
                 $(lineDiv).attr('id', 'id-line-' + $(lineDiv).text());
-                for (var ann of ann_arr) {
-                    if (ann['line'] == $(lineDiv).text()) {
-                        $(lineDiv).text(ann['line'] + "-c")
+                for (var note of notes_arr) {
+                    var line = note.selected_line;
+                    var content = note.note;
+
+                    if (line == $(lineDiv).text()) {
+                        $(lineDiv).text(line + "-c")
 
                         $(lineDiv).hover(
                             function () {
-                                for (var ann of ann_arr) {
-                                    if ($(this).attr('data-line-number') == ann['line']) {
-                                        $('.tip').html(ann['comment']);
+                                for (var note of notes_arr) {
+                                    if ($(this).attr('data-line-number') == line) {
+                                        $('.tip').html(content);
                                     }
                                 }
 

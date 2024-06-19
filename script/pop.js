@@ -1,11 +1,11 @@
 document.getElementById('btn-submit').addEventListener('click', function () {
-	var selectedInfo = chrome.storage.local.get('selectedInfo', function(value){
+	chrome.storage.local.get('selectedInfo', function(value){
 		chrome.runtime.sendMessage(
 			{
 				action: "addNewNotes",
 				data: {
-					note: document.getElementById('id-new-comment').value,
-					...value
+					Note: document.getElementById('id-new-comment').value,
+					...value.selectedInfo
 				}
 			}
 		);
