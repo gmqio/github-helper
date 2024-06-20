@@ -4,14 +4,14 @@ const btn_add_annotation = 'btn_add_annotation';
 chrome.runtime.onInstalled.addListener(() => {
 	chrome.contextMenus.create({
 		id: btn_add_annotation,
-		title: '添加代码注释',
+		title: 'addNote',
 		type: 'normal',
 		contexts: ['all']
 	});
 
 	chrome.contextMenus.create({
 		id: btn_search_km,
-		title: 'KM搜索',
+		title: 'search KM',
 		type: 'normal',
 		contexts: ['all']
 	});
