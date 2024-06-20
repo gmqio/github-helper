@@ -104,11 +104,17 @@ $(document).ready(function () {
                 if (s.trim() == 'Show Notes') {
                     contentDiv.css('display', 'block');
                     $(this).text('Close Notes');
+
                     $('.tip').show();
+
+                    $('#symbols-pane').parent().hide();
                 } else {
                     contentDiv.css('display', 'none');
                     $(this).text('Show Notes');
+
                     $('.tip').hide();
+
+                    $('#symbols-pane').parent().show();
                 }
             });
 
