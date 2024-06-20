@@ -1,4 +1,12 @@
-﻿// 计算textare选中的文字所处行数
+﻿String.prototype.format = function() {
+    var formatted = this;
+    for( var arg in arguments ) {
+        formatted = formatted.replace("{" + arg + "}", arguments[arg]);
+    }
+    return formatted;
+};
+
+// 计算textare选中的文字所处行数
 function getSelectedTextLine(textarea) {
     var startPos = textarea.selectionStart;
     var textBeforeSelection = textarea.value.substring(0, startPos);
@@ -17,10 +25,10 @@ function getUserName() {
 }
 
 // 设置当前行的注释内容
-function setNoteContent(ele, notes_arr) {
+function setNoteContent(lineDiv, tipId) {
     for (var note of notes_arr) {
-        if ($(ele).attr('data-line-number') == note.selected_line) {
-            $('.tip').html(note.note);
+        if ($(lineDiv).attr('data-line-number') == note.selected_line) {
+            $('#' + tipId).html(note.note);
         }
     }
 }
@@ -82,36 +90,60 @@ $(document).ready(function () {
         // 从api获取到数据后，填充到页面上
         function (response) {
             var notes_arr = response.data.data;
-            $('.react-blob-header-edit-and-raw-actions').eq(0).prepend('<div id="tiger_comment">已加载Tiger的评论</div>');
-            $('.react-blob-header-edit-and-raw-actions').eq(0).prepend('<div class="tip" style="display:none">loding...</div>');
+            var firstChild = $('.react-blob-header-edit-and-raw-actions').eq(0).children().eq(0);
+            firstChild.prepend(`<a id="btnNoteSwitch"
+                                    data-testid="raw-button" data-size="small" data-no-visuals="true" class="types__StyledButton-sc-ws60qy-0 dupbIv"
+                                    data-hotkey="Meta+/ Meta+r"><span data-component="buttonContent" class="Box-sc-g0xbh4-0 kkrdEu">
+                                        <span data-component="text">Show Notes</span></span>
+                                </a>`);
+
+            $('#btnNoteSwitch').on('click', function () {
+                var s = $(this).text();
+                var contentDiv = $(this).siblings('.css-bg-code');
+
+                if (s.trim() == 'Show Notes') {
+                    contentDiv.css('display', 'block');
+                    $(this).text('Close Notes');
+                    $('.tip').show();
+                } else {
+                    contentDiv.css('display', 'none');
+                    $(this).text('Show Notes');
+                    $('.tip').hide();
+                }
+            });
 
             $('.react-line-number').each((index, lineDiv) => { // <div data-line-number="2" class="react-line-number react-code-text" style="padding-right: 16px;">2</div>
-                $(lineDiv).attr('id', 'id-line-' + $(lineDiv).text());
                 for (var item of notes_arr) {
                     var line = item.selected_line;
-                    
                     if (line == $(lineDiv).text()) {
                         $(lineDiv).text(line + "-c")
-                        $(lineDiv).hover(
-                            function () {
-                                setNoteContent(this, notes_arr);
-                                $('.tip').fadeIn('slow');
-                            },
-                            function () {
-                                $('.tip').hide();
-                            }
+                        $(lineDiv).attr('id', 'id-line-' + line);
+                        var tipId = 'tip-line-' + line;
+                        $('#read-only-cursor-text-area').parent().parent().parent().parent().parent().parent()
+                            .append(
+                                '<div id="{0}" class="tip" style="display:none">{1}</div>'
+                            .format(
+                                tipId,
+                                item.note
+                            )
                         );
 
-                        $(lineDiv).mousemove(function (e) {
-                            var left = e.clientX + 400;
-                            var top = e.clientY;
-
-                            $('.tip').css({
-                                'top': top + 'px',
-                                'left': left + 'px'
-                            });
-
+                        var top= $(lineDiv).attr('data-line-number') * 20 + 'px';
+                        $('#' + tipId).css({
+                            'top': top,
+                            'left': window.innerWidth * 0.5 + 'px'
                         });
+
+                        console.log('line', line, 'top=', $('#' + tipId).css('top'), 'left=', $('#' + tipId).css('left'));
+
+                        $(lineDiv).hover(
+                            function () {
+                                $('#' + tipId).show();
+                            },
+                            function () {
+                                $('#' + tipId).hide();
+                            }
+                        );
                     }
                 }
             });
