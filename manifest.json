@@ -3,7 +3,7 @@
   "name": "Github Helper",
   "permissions": ["contextMenus","activeTab", "scripting", "storage", "tabs"],
   "version": "0.1",
-  "description": "read github source helper",
+  "description": "write, read, share github source comments",
 
   "background": {
     "service_worker": "script/background.js"
