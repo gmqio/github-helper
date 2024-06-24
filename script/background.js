@@ -96,8 +96,8 @@ chrome.contextMenus.onClicked.addListener((item, tab) => {
 		chrome.windows.create({
 			url: "html/popup-input.html",
 			type: 'popup',
-			width: 600,
-			height: 120,
+			width: 540,
+			height: 230,
 			left: 500,
 			top: 500
 		});
