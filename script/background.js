@@ -4,14 +4,14 @@ const btn_add_annotation = 'btn_add_annotation';
 chrome.runtime.onInstalled.addListener(() => {
 	chrome.contextMenus.create({
 		id: btn_add_annotation,
-		title: 'addNote',
+		title: 'Upsert Comments',
 		type: 'normal',
 		contexts: ['all']
 	});
 
 	chrome.contextMenus.create({
 		id: btn_search_km,
-		title: 'search KM',
+		title: 'Search KM',
 		type: 'normal',
 		contexts: ['all']
 	});
