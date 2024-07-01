@@ -109,13 +109,13 @@ $(document).ready(function () {
                         $(lineDiv).attr('id', 'id-line-' + line);
                         var tipId = 'tip-line-' + line;
 
-                        tipWidth = $('#read-only-cursor-text-area').parent().parent().parent().parent().width() + 262;
+                        tipWidth = $('#btnNoteSwitch').parent().parent().parent().parent().width();
                         $('#read-only-cursor-text-area').parent().parent().parent().parent().parent().parent()
                             .append(
                                 '<div id="{0}" class="tip" style="display:none; width: {1}px">{2}</div>'
                             .format(
                                 tipId,
-                                tipWidth - 50,
+                                tipWidth + 240,
                                 item.note
                             )
                         );
@@ -128,10 +128,8 @@ $(document).ready(function () {
 
                         $(lineDiv).hover(
                             function () {
-                                $('#' + tipId).css('width', tipWidth - $('#filter-results').width() - 60);
+                                $('#' + tipId).css('width', tipWidth - $('#filter-results').width() + 200);
                                 $('#' + tipId).show();
-                                
-                                
                             },
                             function () {
                                 $('#' + tipId).css('width', tipWidth);
@@ -145,6 +143,7 @@ $(document).ready(function () {
             $('#btnNoteSwitch').on('click', function () {
                 var s = $(this).text();
                 var contentDiv = $(this).siblings('.css-bg-code');
+                $('.tip').css('width', tipWidth + 240 + 'px');
 
                 if (s.trim() == 'Show Notes') {
                     contentDiv.css('display', 'block');
