@@ -55,6 +55,7 @@ function getFileInfo() {
     }
     
 }
+var tipWidth = 0;
 $(document).ready(function () {
     // 右键菜单点击响应， 将选中的文本发送到backgroud script中
     document.addEventListener('contextmenu', function (e) {
@@ -91,11 +92,54 @@ $(document).ready(function () {
         function (response) {
             var notes_arr = response.data.data;
             var firstChild = $('.react-blob-header-edit-and-raw-actions').eq(0).children().eq(0);
-            firstChild.prepend(`<a id="btnNoteSwitch"
-                                    data-testid="raw-button" data-size="small" data-no-visuals="true" class="types__StyledButton-sc-ws60qy-0 dupbIv"
-                                    data-hotkey="Meta+/ Meta+r"><span data-component="buttonContent" class="Box-sc-g0xbh4-0 kkrdEu">
-                                        <span data-component="text">Show Notes</span></span>
+
+            firstChild.prepend(`<a id="btnNoteSwitch" class="types__StyledButton-sc-ws60qy-0 dupbIv" data-testid="raw-button" data-size="small" data-no-visuals="false">
+                                    Show Notes
                                 </a>`);
+            
+            $('#btnNoteSwitch').attr('class', $('.types__StyledButton-sc-ws60qy-0').eq(0).attr('class'));
+
+            $('.react-line-number').each((index, lineDiv) => { // <div data-line-number="2" class="react-line-number react-code-text" style="padding-right: 16px;">2</div>
+                for (var item of notes_arr) {
+                    var line = item.selected_line;
+                    if (line == $(lineDiv).text()) {
+                        $(lineDiv).text(line + "-c");
+                        $(lineDiv).css("padding-right", "1px");
+                        $(lineDiv).attr('id', 'id-line-' + line);
+                        var tipId = 'tip-line-' + line;
+
+                        tipWidth = $('#read-only-cursor-text-area').parent().parent().parent().parent().width() + 262;
+                        $('#read-only-cursor-text-area').parent().parent().parent().parent().parent().parent()
+                            .append(
+                                '<div id="{0}" class="tip" style="display:none; width: {1}px">{2}</div>'
+                            .format(
+                                tipId,
+                                tipWidth - 50,
+                                item.note
+                            )
+                        );
+
+                        var top= ((parseInt($(lineDiv).attr('data-line-number')) + 1) * 20 + 12) + 'px';
+                        $('#' + tipId).css({
+                            'top': top,
+                            'right': '0px'
+                        });
+
+                        $(lineDiv).hover(
+                            function () {
+                                $('#' + tipId).css('width', tipWidth - $('#filter-results').width() - 50);
+                                $('#' + tipId).show();
+                                
+                                
+                            },
+                            function () {
+                                $('#' + tipId).css('width', tipWidth);
+                                $('#' + tipId).hide();
+                            }
+                        );
+                    }
+                }
+            });
 
             $('#btnNoteSwitch').on('click', function () {
                 var s = $(this).text();
@@ -106,7 +150,6 @@ $(document).ready(function () {
                     $(this).text('Close Notes');
 
                     $('.tip').show();
-
                     $('#symbols-pane').parent().hide();
                 } else {
                     contentDiv.css('display', 'none');
@@ -118,40 +161,6 @@ $(document).ready(function () {
                 }
             });
 
-            $('.react-line-number').each((index, lineDiv) => { // <div data-line-number="2" class="react-line-number react-code-text" style="padding-right: 16px;">2</div>
-                for (var item of notes_arr) {
-                    var line = item.selected_line;
-                    if (line == $(lineDiv).text()) {
-                        $(lineDiv).text(line + "-c")
-                        $(lineDiv).attr('id', 'id-line-' + line);
-                        var tipId = 'tip-line-' + line;
-                        $('#read-only-cursor-text-area').parent().parent().parent().parent().parent().parent()
-                            .append(
-                                '<div id="{0}" class="tip" style="display:none">{1}</div>'
-                            .format(
-                                tipId,
-                                item.note
-                            )
-                        );
-
-                        var top= $(lineDiv).attr('data-line-number') * 20 + 'px';
-                        $('#' + tipId).css({
-                            'top': top,
-                            'left': window.innerWidth * 0.5 + 'px'
-                        });
-
-                        console.log('line', line, 'top=', $('#' + tipId).css('top'), 'left=', $('#' + tipId).css('left'));
-
-                        $(lineDiv).hover(
-                            function () {
-                                $('#' + tipId).show();
-                            },
-                            function () {
-                                $('#' + tipId).hide();
-                            }
-                        );
-                    }
-                }
-            });
+            
         });
 });
