@@ -90,6 +90,7 @@ $(document).ready(function () {
         },
         // 从api获取到数据后，填充到页面上
         function (response) {
+            console.log('response', response)
             var notes_arr = response.data.data;
             var firstChild = $('.react-blob-header-edit-and-raw-actions').eq(0).children().eq(0);
 
@@ -127,7 +128,7 @@ $(document).ready(function () {
 
                         $(lineDiv).hover(
                             function () {
-                                $('#' + tipId).css('width', tipWidth - $('#filter-results').width() - 50);
+                                $('#' + tipId).css('width', tipWidth - $('#filter-results').width() - 60);
                                 $('#' + tipId).show();
                                 
                                 

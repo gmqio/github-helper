@@ -24,14 +24,14 @@ function buildGetParams(data) {
 }
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 	if (request.action === "getNotesByLine") {
-		fetch('http://81.70.42.24:6001/note/query?' + buildGetParams(request.data))
+		fetch('http://chrome.app.api.gmq.pub/note/query?' + buildGetParams(request.data))
 			.then(response => response.json())
 			.then(data => sendResponse({ data: data }))
 			.catch(error => sendResponse({ e: error }));
 	}
 	if (request.action === "addNewNotes") {
 		fetch(
-			"http://81.70.42.24:6001/note/add",
+			"http://chrome.app.api.gmq.pub/note/add",
 			{
 				method: 'POST',
 				headers: {

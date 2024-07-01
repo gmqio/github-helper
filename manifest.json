@@ -1,7 +1,16 @@
 ﻿{
   "manifest_version": 3,
   "name": "ShareComment",
-  "permissions": ["contextMenus","activeTab", "scripting", "storage", "tabs"],
+  "permissions": [
+    "contextMenus",
+    "activeTab", 
+    "scripting", 
+    "storage", 
+    "tabs"
+  ],
+  "host_permissions": [
+		"http://chrome.app.api.gmq.pub/*" 
+	],
   "version": "0.0.1",
   "description": "write, read, share github source comments",
 
@@ -14,7 +23,9 @@
       "all_frames": true,
       "js": ["script/jquery-3.7.1.min.js", "script/content_script.js" ],
       "css": ["css/index.css"],
-      "matches": [ "https://github.com/*" ],
+      "matches": [ 
+        "https://github.com/*"
+      ],
       "run_at": "document_end"
     }
   ],
