@@ -1,3 +1,5 @@
+init();
+
 document.getElementById('btn-submit').addEventListener('click', function () {
 	chrome.storage.local.get('selectedInfo', function (value) {
 		chrome.runtime.sendMessage(
@@ -13,6 +15,14 @@ document.getElementById('btn-submit').addEventListener('click', function () {
 
 
 });
+
+function init(){
+	chrome.storage.local.get('selectedInfo', function (value) {
+		if (value.selectedInfo.OldContent){
+			$('#id-new-comment').text(value.selectedInfo.OldContent);
+		}
+	});
+}
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 	console.log('receive send result : request', request);

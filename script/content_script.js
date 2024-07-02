@@ -55,7 +55,9 @@ function getFileInfo() {
     }
     
 }
-var tipWidth = 0;
+
+var all_comment_arr = [];
+
 $(document).ready(function () {
     // 右键菜单点击响应， 将选中的文本发送到backgroud script中
     document.addEventListener('contextmenu', function (e) {
@@ -63,12 +65,25 @@ $(document).ready(function () {
         if (textarea && textarea === document.activeElement && textarea.selectionStart !== textarea.selectionEnd) {
             var selectedText = textarea.value.substring(textarea.selectionStart, textarea.selectionEnd);
             var selectedLine = getSelectedTextLine(textarea);
+
+            var comment_content;
+            for (var item of all_comment_arr) {
+                if (item.selected_line == selectedLine){
+                    comment_content = item.note;
+                    break;
+                }
+            }
+
             var current = {
+                OldContent: comment_content,
                 UserName: getUserName(),
                 SelectedText: selectedText,
                 SelectedLine: selectedLine,
                 ...getFileInfo()
             };
+            
+            
+
             chrome.runtime.sendMessage({
                 data: current,
                 action: "passSelectedInfo"
@@ -92,6 +107,7 @@ $(document).ready(function () {
         function (response) {
             console.log('response', response)
             var notes_arr = response.data.data;
+            all_comment_arr = notes_arr;
             var firstChild = $('.react-blob-header-edit-and-raw-actions').eq(0).children().eq(0);
 
             firstChild.prepend(`<a id="btnNoteSwitch" class="types__StyledButton-sc-ws60qy-0 dupbIv" data-testid="raw-button" data-size="small" data-no-visuals="false">
@@ -109,13 +125,12 @@ $(document).ready(function () {
                         $(lineDiv).attr('id', 'id-line-' + line);
                         var tipId = 'tip-line-' + line;
 
-                        tipWidth = $('#btnNoteSwitch').parent().parent().parent().parent().width();
                         $('#read-only-cursor-text-area').parent().parent().parent().parent().parent().parent()
                             .append(
                                 '<div id="{0}" class="tip" style="display:none; width: {1}px">{2}</div>'
                             .format(
                                 tipId,
-                                tipWidth + 240,
+                                $('#btnNoteSwitch').parent().parent().parent().parent().width() - 82,
                                 item.note
                             )
                         );
@@ -128,11 +143,11 @@ $(document).ready(function () {
 
                         $(lineDiv).hover(
                             function () {
-                                $('#' + tipId).css('width', tipWidth - $('#filter-results').width() + 200);
+                                $('#' + tipId).css('width', $('#btnNoteSwitch').parent().parent().parent().parent().width() - 82);
+                                console.log('hover show', $('#btnNoteSwitch').parent().parent().parent().parent().width() - 82);
                                 $('#' + tipId).show();
                             },
                             function () {
-                                $('#' + tipId).css('width', tipWidth);
                                 $('#' + tipId).hide();
                             }
                         );
@@ -143,21 +158,25 @@ $(document).ready(function () {
             $('#btnNoteSwitch').on('click', function () {
                 var s = $(this).text();
                 var contentDiv = $(this).siblings('.css-bg-code');
-                $('.tip').css('width', tipWidth + 240 + 'px');
 
                 if (s.trim() == 'Show Notes') {
+                    $('#symbols-pane').parent().hide();
+
                     contentDiv.css('display', 'block');
                     $(this).text('Close Notes');
 
+                    // 每次都重新计算宽度，兼容右边panel可能开、关的情况
+                    $('.tip').css('width', $('#btnNoteSwitch').parent().parent().parent().parent().width() - 82);
                     $('.tip').show();
-                    $('#symbols-pane').parent().hide();
+                    
                 } else {
+                    $('#symbols-pane').parent().show();
                     contentDiv.css('display', 'none');
                     $(this).text('Show Notes');
-
+                    
                     $('.tip').hide();
 
-                    $('#symbols-pane').parent().show();
+                    
                 }
             });
 
